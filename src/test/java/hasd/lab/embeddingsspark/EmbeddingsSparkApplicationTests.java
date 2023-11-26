@@ -27,7 +27,8 @@ class EmbeddingsSparkApplicationTests {
         cleanDirectory(directory);
         assertTrue(checkThatDirectoryIsEmpty("orc"));
         assertTrue(launchSpark("hasd.lab.embeddingsspark.jobs.SaveAvroEmbeddingsToOrc"));
-        assertFalse(checkThatDirectoryIsEmpty("orc"));}
+        assertFalse(checkThatDirectoryIsEmpty("orc"));
+    }
 
     @Test
     void saveToParquetTest() {
@@ -41,7 +42,7 @@ class EmbeddingsSparkApplicationTests {
 
     @Test
     void loadFromParquetTest() {
-      assertTrue(launchSpark("hasd.lab.embeddingsspark.jobs.LoadEmbeddingsFromParquet"));
+        assertTrue(launchSpark("hasd.lab.embeddingsspark.jobs.LoadEmbeddingsFromParquet"));
     }
 
     @Test
@@ -56,25 +57,25 @@ class EmbeddingsSparkApplicationTests {
     }
 
 
-
-        private boolean launchSpark(String mainClass) {
+    private boolean launchSpark(String mainClass) {
         try {
-        Process spark = new SparkLauncher()
-                .setAppResource("/home/maria/IdeaProjects/embeddings-spark/target/embeddings-spark-0.0.1-SNAPSHOT.jar")
-                .setMainClass(mainClass)
-                .setMaster("local")
-                .setVerbose(true)
-                .addSparkArg("--packages", "org.apache.spark:spark-avro_2.12:3.5.0")
-                .setConf(SparkLauncher.DRIVER_MEMORY, "2g")
-                .launch();
-        spark.waitFor(); } catch (IOException | InterruptedException e) {
+            Process spark = new SparkLauncher()
+                    .setAppResource("/home/maria/IdeaProjects/embeddings-spark/target/embeddings-spark-0.0.1-SNAPSHOT.jar")
+                    .setMainClass(mainClass)
+                    .setMaster("local")
+                    .setVerbose(true)
+                    .addSparkArg("--packages", "org.apache.spark:spark-avro_2.12:3.5.0")
+                    .setConf(SparkLauncher.DRIVER_MEMORY, "2g")
+                    .launch();
+            spark.waitFor();
+        } catch (IOException | InterruptedException e) {
             return false;
         }
         return true;
     }
 
     private boolean checkThatDirectoryIsEmpty(String directoryName) {
-        try (Stream<Path> stream = Files.list(Path.of(directoryName))){
+        try (Stream<Path> stream = Files.list(Path.of(directoryName))) {
             return stream.findAny().isEmpty();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -88,6 +89,7 @@ class EmbeddingsSparkApplicationTests {
             throw new RuntimeException(e);
         }
     }
+
     private void launchSpark(String mainClass, int embeddingsAmount) throws InterruptedException, IOException {
         Process spark = new SparkLauncher()
                 .setAppResource("/home/maria/IdeaProjects/embeddings-spark/target/embeddings-spark-0.0.1-SNAPSHOT.jar")

@@ -13,10 +13,9 @@ import java.io.IOException;
 public class SaveAvroEmbeddingsToOrc {
 
     public static void main(String[] args) throws IOException {
-        FileUtils.writeStringToFile(new File("qwert.txt"), args[0]);
         SparkSession spark = SparkSessionBuilder.create();
         Dataset<Row> embeddingsDf = spark.read().format("avro").load(Constants.PATH_TO_AVRO_EMBEDDINGS_FILE + args[0] + "embeddings.avro");
-        embeddingsDf.write().format("orc").save(Constants.PATH_TO_AVRO_EMBEDDINGS_FILE + args[0] + "embeddings.orc");
+        embeddingsDf.write().mode("overwrite").format("orc").save(Constants.PATH_TO_AVRO_EMBEDDINGS_FILE + args[0] + "embeddings.orc");
         spark.stop();
     }
 }

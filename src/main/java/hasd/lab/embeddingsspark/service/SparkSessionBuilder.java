@@ -17,6 +17,7 @@ public class SparkSessionBuilder {
                 .appName("avro2orc&parquet")
                 .getOrCreate();
     }
+
     private final SparkSession spark;
 
     public SparkSessionBuilder() {
@@ -39,6 +40,7 @@ public class SparkSessionBuilder {
         embeddingsDf.write().format("orc").save("embeddings.orc");
         spark.stop();
     }
+
     public Dataset<Row> loadEmbeddingsFromFile() {
         return spark.read().format("avro").load(Constants.PATH_TO_AVRO_EMBEDDINGS_FILE);
     }

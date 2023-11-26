@@ -11,11 +11,12 @@ import java.io.IOException;
 
 @State(Scope.Benchmark)
 public class ExecutionPlan {
-    @Param({ "Orc", "Parquet"})
+    @Param({"Orc", "Parquet"})
     private String format;
 
-    @Param({ "10",  "100",  "1000", "10000"})
+    @Param({"10", "100", "1000", "10000"})
     private int embeddingsAmount;
+
     public String getFormat() {
         return format;
     }
@@ -30,19 +31,10 @@ public class ExecutionPlan {
                 .setAppResource("/home/maria/IdeaProjects/embeddings-spark/target/embeddings-spark-0.0.1-SNAPSHOT.jar")
                 .setMainClass(mainClass)
                 .setMaster("local")
-                .setVerbose(true)
                 .addSparkArg("--packages", "org.apache.spark:spark-avro_2.12:3.5.0")
-                .addAppArgs(String.valueOf(embeddingsAmount))
+                .addAppArgs(embeddingsAmount + "/")
                 .setConf(SparkLauncher.DRIVER_MEMORY, "2g")
                 .launch();
         spark.waitFor();
-    }
-
-    public synchronized void cleanDirectory(File directory) {
-        try {
-            FileUtils.cleanDirectory(directory);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 }
