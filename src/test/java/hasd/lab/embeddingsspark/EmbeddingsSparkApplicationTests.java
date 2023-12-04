@@ -1,6 +1,5 @@
 package hasd.lab.embeddingsspark;
 
-import hasd.lab.embeddingsspark.jmh.ExecutionPlan;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.launcher.SparkLauncher;
 import org.junit.jupiter.api.Test;
@@ -94,11 +93,12 @@ class EmbeddingsSparkApplicationTests {
         Process spark = new SparkLauncher()
                 .setAppResource("/home/maria/IdeaProjects/embeddings-spark/target/embeddings-spark-0.0.1-SNAPSHOT.jar")
                 .setMainClass(mainClass)
-                .setMaster("local")
-                .setVerbose(true)
+                .setMaster("local[*]")
                 .addSparkArg("--packages", "org.apache.spark:spark-avro_2.12:3.5.0")
-                .addAppArgs(String.valueOf(embeddingsAmount))
-                .setConf(SparkLauncher.DRIVER_MEMORY, "2g")
+                .addAppArgs(embeddingsAmount + "/", "snappy")
+                .setConf(SparkLauncher.DRIVER_MEMORY, "10g")
+                .setConf(SparkLauncher.EXECUTOR_MEMORY, "3g")
+                .setConf(SparkLauncher.EXECUTOR_CORES, "4")
                 .launch();
         spark.waitFor();
     }

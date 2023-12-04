@@ -12,7 +12,6 @@ import static hasd.lab.embeddingsspark.util.Constants.PATH_TO_AVRO_EMBEDDINGS_FI
 @Measurement(iterations = 1, time = 200, timeUnit = TimeUnit.MILLISECONDS)
 @Fork(1)
 public class FileBenchmark {
-
     public static void main(String[] args) throws Exception {
         org.openjdk.jmh.Main.main(args);
     }

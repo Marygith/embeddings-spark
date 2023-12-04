@@ -12,10 +12,16 @@ import java.io.IOException;
 
 public class SaveAvroEmbeddingsToOrc {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         SparkSession spark = SparkSessionBuilder.create();
-        Dataset<Row> embeddingsDf = spark.read().format("avro").load(Constants.PATH_TO_AVRO_EMBEDDINGS_FILE + args[0] + "embeddings.avro");
-        embeddingsDf.write().mode("overwrite").format("orc").save(Constants.PATH_TO_AVRO_EMBEDDINGS_FILE + args[0] + "embeddings.orc");
+        Dataset<Row> embeddingsDf = spark.read().format("avro")
+                .load(Constants.PATH_TO_AVRO_EMBEDDINGS_FILE
+                        + args[0] + "embeddings.avro").repartition(2000);
+
+        embeddingsDf.write().mode("overwrite")
+                .format("orc").option("compression", args[1])
+                .save(Constants.PATH_TO_AVRO_EMBEDDINGS_FILE
+                        + args[0] + args[1] + "/" + "embeddings.orc");
         spark.stop();
     }
 }

@@ -1,18 +1,16 @@
 package hasd.lab.embeddingsspark.jmh;
 
-import hasd.lab.embeddingsspark.util.Constants;
-import org.apache.spark.launcher.SparkLauncher;
 import org.openjdk.jmh.annotations.*;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 
+@Fork(2)
 @State(Scope.Benchmark)
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.SECONDS)
-@Warmup(iterations = 2, time = 200, timeUnit = TimeUnit.MILLISECONDS)
+@Warmup(iterations = 1, time = 200, timeUnit = TimeUnit.MILLISECONDS)
 @Measurement(iterations = 5, time = 200, timeUnit = TimeUnit.MILLISECONDS)
 public class LoadingBenchmark {
 
@@ -20,10 +18,32 @@ public class LoadingBenchmark {
         org.openjdk.jmh.Main.main(args);
     }
 
+    @State(Scope.Thread)
+    public static class BenchmarkState {
+
+        @Setup(Level.Invocation)
+        public void doSetup(ExecutionPlan plan) throws IOException, InterruptedException {
+            System.out.println("Setup started");
+            String pathToClass = "hasd.lab.embeddingsspark.jobs.LoadEmbeddingsFrom" + plan.getFormat();
+            String compType = plan.getCompressionType().equals("gzip") & plan.getFormat().equals("Orc") ? "zlib" : plan.getCompressionType();
+            spark = plan.launchSparkSession(pathToClass, plan.getEmbeddingsAmount(), compType);
+            System.out.println("Setup ended");
+        }
+
+        @TearDown(Level.Invocation)
+        public void doTearDown() {
+            System.out.println("TearDown started");
+            spark = null;
+            System.gc();
+            System.out.println("TearDown ended");
+        }
+
+        public Process spark;
+    }
+
     @Benchmark
     @BenchmarkMode(Mode.Throughput)
-    public void testLoading(ExecutionPlan plan) throws IOException, InterruptedException {
-        String pathToClass = "hasd.lab.embeddingsspark.jobs.LoadEmbeddingsFrom" + plan.getFormat();
-        plan.launchSpark(pathToClass, plan.getEmbeddingsAmount());
+    public void testLoading(ExecutionPlan plan, BenchmarkState state) throws IOException, InterruptedException {
+        plan.launchJob(state.spark);
     }
 }

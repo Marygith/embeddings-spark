@@ -10,8 +10,10 @@ public class LoadEmbeddingsFromOrc {
 
     public static void main(String[] args) {
         SparkSession spark = SparkSessionBuilder.create();
-        Dataset<Row> embeddingsDf = spark.read().format("orc").load(Constants.PATH_TO_AVRO_EMBEDDINGS_FILE + args[0] + "embeddings.orc");
-        System.out.println(embeddingsDf.count());
+        Dataset<Row> embeddingsDf = spark.read().format("orc")
+                .load(Constants.PATH_TO_AVRO_EMBEDDINGS_FILE
+                        + args[0] + args[1] + "/" + "embeddings.orc")
+                .repartition(2000);
         spark.stop();
     }
 }
